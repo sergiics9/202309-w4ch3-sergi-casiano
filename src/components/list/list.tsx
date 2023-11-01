@@ -1,28 +1,19 @@
-import { Component } from '../../components/component';
-import { AnyCharacter, Card } from './card';
-import { repo } from '../data/repo';
+import { useEffect } from 'react';
+import { Card } from '../card/card';
+import { useCharacters } from '../../hooks/useCharacters';
+import '../../main.scss';
 
-export class List extends Component {
-  constructor(selector: string) {
-    super(selector);
-    this.template = this.createTemplate();
-    this.render();
-  }
+export function List() {
+  const { characters, loadCharacters } = useCharacters();
 
-  refresh() {
-    this.clear();
-    this.render();
-  }
-
-  render() {
-    super.render();
-    const elements = repo().map(
-      (item) => new Card('ul', item as AnyCharacter, this.refresh.bind(this))
-    );
-    console.log(elements);
-  }
-
-  createTemplate() {
-    return '<ul class="characters-list row list-unstyled"></ul>';
-  }
+  useEffect(() => {
+    loadCharacters();
+  }, [loadCharacters]);
+  return (
+    <ul className="characters-list row list-unstyled">
+      {characters.map((item) => (
+        <Card key={item.name} character={item}></Card>
+      ))}
+    </ul>
+  );
 }
