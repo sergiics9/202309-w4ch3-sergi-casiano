@@ -1,10 +1,12 @@
+export type Category = 'King' | 'Fighter' | 'Adviser' | 'Squire';
+
 export interface Character {
   name: string;
   family: string;
   age: number;
   isAlive: boolean;
   personalQuote: string;
-  category: King | Fighter | Adviser | Squire;
+  category: Category;
 }
 
 export interface King extends Character {
