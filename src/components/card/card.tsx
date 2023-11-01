@@ -1,131 +1,70 @@
-import { Component } from '../../components/component';
-import { Advisor } from '../model/advisor';
-import { Category } from '../model/character';
-import { Fighter } from '../model/fighter';
-import { King } from '../model/king';
-import { Squire } from '../model/squire';
+import { Fighter } from '../../models/character';
+import { King } from '../../models/character';
+import { Squire } from '../../models/character';
+import { Adviser } from '../../models/character';
+import '../../main.scss';
 
-export type AnyCharacter = King | Fighter | Advisor | Squire;
+export type AnyCharacter = King | Fighter | Adviser | Squire;
 
 function makeExtraData(item: AnyCharacter) {
-  let result = '';
-  if (item instanceof King) {
-    result = `<li>Años de reinado: ${item.kingdomYears}</li>`;
-  } else if (item instanceof Fighter) {
-    result = `
-      <li>Arma: ${item.weapon}</li>
-      <li>Destreza: ${item.skill}</li>`;
-  } else if (item instanceof Advisor) {
-    result = `
-      <li>Sirve a: ${item.advisorBoss.name}</li>`;
-  } else {
-    result = `
-        <li>Peloteo: ${item.servilityGrade}</li>
-        <li>Asesora a: ${item.patron.name}</li>`;
-  }
-
-  return result;
-}
-
-function makEmoji(category: Category) {
-  switch (category) {
-    case 'King':
-      return '👑';
-    case 'Fighter':
-      return '🗡';
-    case 'Advisor':
-      return '🎓';
-    default:
-      return '🛡';
+  if ('reignYears' in item) {
+    return <li>Años de reinado: {item.reignYears}</li>;
+  } else if ('weapon' in item) {
+    return <li>Arma: {item.weapon}</li>;
+    // } else if ('skillLevel' in item) {
+    //   return <li>Destreza: {item.skillLevel}</li>
+  } else if ('adviseTo' in item) {
+    return <li>Sirve a: {item.adviseTo.name}</li>;
+    // } else if  ('servilityGrade' in item) {
+    //   return <li>Peloteo: {item.servilityGrade}</li>
+  } else if ('servesTo' in item) {
+    return <li>Asesora a: {item.servesTo.name}</li>;
   }
 }
 
-export class Card extends Component {
+type Props = {
   character: AnyCharacter;
-  refresh: () => void;
-  constructor(selector: string, character: AnyCharacter, refresh: () => void) {
-    super(selector);
-    this.refresh = refresh;
-    this.character = character;
-    this.manageComponent();
-  }
+};
 
-  manageComponent() {
-    this.template = this.createTemplate();
-    this.render();
-  }
-
-  handleTalk() {
-    console.log(this.character.name);
-    const talkElement = document.querySelector('.communications');
-    talkElement!.firstElementChild!.textContent = this.character.talk();
-    talkElement!.classList.add('on');
-    setTimeout(() => {
-      talkElement!.classList.remove('on');
-    }, 2000);
-  }
-
-  handleDead() {
-    // Alt this.character.isAlive = false!;
-    this.character.dead();
-    console.log(this.character);
-    // Temp this.clear();
-    // this.manageComponent();
-    // this.element
-    //   .querySelector('.card-img-top')
-    //   ?.classList.add('.character__card_down');
-    this.refresh();
-  }
-
-  render() {
-    super.render();
-    this.element
-      .querySelector('.talk')
-      ?.addEventListener('click', this.handleTalk.bind(this));
-    this.element
-      .querySelector('.dead')
-      ?.addEventListener('click', this.handleDead.bind(this));
-  }
-
-  createTemplate() {
-    return `
-  <li class="character col">
-    <div class="card character__card">
-      <img src="/img/${this.character.name.toLowerCase()}.jpg" alt="${
-      this.character.name
-    } ${this.character.family}" class="character__picture 
-      ${!this.character.isAlive && 'card-img-top'}" />
-      <div class="card-body">
-        <h2 class="character__name card-title h4">${this.character.name} ${
-      this.character.family
-    }</h2>
-        <div class="character__info">
-          <ul class="list-unstyled">
-            <li>Edad: ${this.character.age} años</li>
-            <li>
-              Estado: ${
-                this.character.isAlive
-                  ? `<i class="fas fa-thumbs-up">`
-                  : `<i class="fas fa-thumbs-down">`
-              }
-              </i>
-              </i>
-            </li>
-          </ul>
-        </div>
-        <div class="character__overlay">
-          <ul class="list-unstyled">
-              ${makeExtraData(this.character)}
-          </ul>
-          <div class="character__actions">
-            <button class="character__action btn talk">habla</button>
-            <button class="character__action btn dead">muere</button>
+export function Card({ character }: Props) {
+  return (
+    <>
+      <li className="character col">
+        <div className="card character__card">
+          <img
+            src={`${character.name.toLowerCase()}.jpg`}
+            alt={character.name}
+            className="character__picture 
+      {!character.isAlive && 'card-img-top'}"
+          />
+          <div className="card-body">
+            <h2 className="character__name card-title h4">
+              {character.name} ${character.family}
+            </h2>
+            <div className="character__info">
+              <ul className="list-unstyled">
+                <li>Edad: {character.age} años</li>
+                <li>
+                  Estado:{' '}
+                  {character.isAlive ? (
+                    <i className="fas fa-thumbs-up" />
+                  ) : (
+                    <i className="fas fa-thumbs-down" />
+                  )}
+                </li>
+              </ul>
+            </div>
+            <div className="character__overlay">
+              <ul className="list-unstyled">{makeExtraData(character)}</ul>
+              <div className="character__actions">
+                <button className="character__action btn talk">habla</button>
+                <button className="character__action btn dead">muere</button>
+              </div>
+            </div>
           </div>
+          {/* <i className="emoji">${makEmoji(character.category)}</i> */}
         </div>
-      </div>
-      <i class="emoji">${makEmoji(this.character.category)}</i>
-    </div>
-  </li>
-`;
-  }
+      </li>
+    </>
+  );
 }
