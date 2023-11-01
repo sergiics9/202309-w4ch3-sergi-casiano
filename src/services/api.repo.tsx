@@ -1,7 +1,4 @@
-import { Fighter } from '../models/character';
-import { King } from '../models/character';
-import { Squire } from '../models/character';
-import { Adviser } from '../models/character';
+import { Fighter, King, Squire, Adviser } from '../models/character';
 
 export type AnyCharacter = King | Fighter | Adviser | Squire;
 
